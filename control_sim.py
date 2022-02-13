@@ -17,9 +17,7 @@ theta_accel = - m * g * sin(theta) + torque
 
 import math
 import time
-from tkinter.tix import MAX
 import matplotlib.pyplot as plt
-import numpy as np
 import imageio
 
 dt = 0.05
@@ -36,7 +34,7 @@ class Pendulum(object):
         self._fig.tight_layout()
         self._frame_n = 0
 
-    def render_frame(self, ts, thetas, theta_vels, torques, save):
+    def render_frame(self, ts, thetas, torques, save):
         # draw graphs
         _axs = self._axs
         _axs[0].clear()
@@ -44,7 +42,6 @@ class Pendulum(object):
         _axs[0].set_ylim(-.5, 3.5)
 
         _axs[0].plot(ts, thetas, label="theta")
-        # _axs[0].plot(ts, theta_vels, label="theta_vel")
         _axs[0].plot([0, self.t_end], [GOAL, GOAL], "g--", label="goal")
         _axs[0].plot(ts, torques, label="torque")
         _axs[0].legend(loc="lower right")
@@ -98,7 +95,7 @@ class Pendulum(object):
 
             # render
             if len(ts) % 5 == 0:
-                self.render_frame(ts, thetas, theta_vels, torques, save)
+                self.render_frame(ts, thetas, torques, save)
             
         # render gif using imageio
         if save:
@@ -141,14 +138,12 @@ class ControlLawPID(object):
         return self.k_p * error + self.k_i * self.integral + self.k_d * derivative
 
 
-p = Pendulum()
-p.run("null", control_law_null, init_theta=.75, save=True)
-p.run("bang", control_law_bang_bang, init_theta=.75,save=True)
-p.run("p", ControlLawPID(-5.5, 0, -.5), init_theta=.75, save=True)
-p.run("pi", ControlLawPID(-3.5, -1.40, -.5), init_theta=.75, save=True)
-p.run("pd", ControlLawPID(-5.5, 0, -1.5), init_theta=.75, save=True)
-p.run("pid", ControlLawPID(-5.5, -3.0, -1.5), init_theta=.75, save=True)
-p.run("pid2", ControlLawPID(-5.5, -5.60, -5.5), init_theta=.75, save=True)
-
-
-
+if __name__ == "__main__":
+    p = Pendulum()
+    p.run("null", control_law_null, init_theta=.75, save=True)
+    p.run("bang", control_law_bang_bang, init_theta=.75,save=True)
+    p.run("p", ControlLawPID(-5.5, 0, -.5), init_theta=.75, save=True)
+    p.run("pi", ControlLawPID(-3.5, -1.40, -.5), init_theta=.75, save=True)
+    p.run("pd", ControlLawPID(-5.5, 0, -1.5), init_theta=.75, save=True)
+    p.run("pid", ControlLawPID(-5.5, -3.0, -1.5), init_theta=.75, save=True)
+    p.run("pid2", ControlLawPID(-5.5, -5.60, -5.5), init_theta=.75, save=True)
