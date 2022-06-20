@@ -2,4 +2,4 @@ matplotlib
 snakeviz
 numpy
 imageio
-glob
+control

@@ -18,7 +18,9 @@ theta_accel = - m * g * sin(theta) + torque
 import math
 import time
 import matplotlib.pyplot as plt
+import numpy as np
 import imageio
+import control
 
 dt = 0.05
 MAX_F = 30.0
@@ -138,12 +140,24 @@ class ControlLawPID(object):
         return self.k_p * error + self.k_i * self.integral + self.k_d * derivative
 
 
+def control_law_lqr(theta : float, theta_vel : float) -> float:
+    A = np.array([[0, 1], [-1, 0]])
+    B = np.array([[0], [1]])
+    q = 10.0
+    Q = np.array([[q, 0], [0, q]])
+    R = np.array([[1]])
+
+    K, _, _ = control.lqr(A, B, Q, R)
+    return K[0, 0] * (GOAL - theta) + K[0, 1] * (0.0 - theta_vel) + 1.0
+
+
 if __name__ == "__main__":
     p = Pendulum()
-    p.run("null", control_law_null, init_theta=.75, save=True)
-    p.run("bang", control_law_bang_bang, init_theta=.75,save=True)
-    p.run("p", ControlLawPID(-5.5, 0, -.5), init_theta=.75, save=True)
-    p.run("pi", ControlLawPID(-3.5, -1.40, -.5), init_theta=.75, save=True)
-    p.run("pd", ControlLawPID(-5.5, 0, -1.5), init_theta=.75, save=True)
-    p.run("pid", ControlLawPID(-5.5, -3.0, -1.5), init_theta=.75, save=True)
-    p.run("pid2", ControlLawPID(-5.5, -5.60, -5.5), init_theta=.75, save=True)
+    # p.run("null", control_law_null, init_theta=.75, save=True)
+    # p.run("bang", control_law_bang_bang, init_theta=.75,save=True)
+    # p.run("p", ControlLawPID(-5.5, 0, -.5), init_theta=.75, save=True)
+    # p.run("pi", ControlLawPID(-3.5, -1.40, -.5), init_theta=.75, save=True)
+    # p.run("pd", ControlLawPID(-5.5, 0, -1.5), init_theta=.75, save=True)
+    # p.run("pid", ControlLawPID(-5.5, -3.0, -1.5), init_theta=.75, save=True)
+    # p.run("pid2", ControlLawPID(-5.5, -5.60, -5.5), init_theta=.75, save=True)
+    p.run("lqr", control_law_lqr, init_theta=.75, save=True)
